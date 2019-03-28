@@ -1,0 +1,12 @@
+Package: NeuralNetwork
+Type: Package
+Title: Neural network for regression and binary classification
+Version: 2019.03.28
+Author: Sixian Zhang, Zaoyi Chi, Hao Wang
+Maintainer: Sixian Zhang <sz244@nau.edu>
+License: GPL-3
+Description: This is a neural network package that learn from a traning data set and 
+    predict the output of a test data set
+LinkingTo: RcppEigen
+Suggests: ElemStatLearn, rmarkdown, knitr
+VignetteBuilder: knitr, rmarkdown
