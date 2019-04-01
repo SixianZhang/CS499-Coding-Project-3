@@ -63,11 +63,13 @@ NNetIteration <-
       temp.b.vec <- temp.z.mat %*% v.vec # n x 1
       if (is.binary){
         temp.y.vec <- sigmoid(temp.b.vec)
-        v.vec <- v.vec - step.size * ((t(temp.z.mat) %*% (temp.y.vec - y.train)) / n.obeservations)
-        
+        error <- temp.y.vec - y.train
+        v.vec <- v.vec - step.size * rowMeans(t(temp.z.mat) %*% (error) %*% t(dsigmoid(temp.b.vec)))
+        W.mat <- W.mat - step.size * (t(X.scaled.train) %*% ((temp.b.vec - y.train) %*% t(v.vec) * dsigmoid(temp.a.mat)) / n.obeservations)
       }else{
-        v.vec <- v.vec - step.size * ((t(temp.z.mat) %*% (temp.y.vec - y.train)) / n.obeservations)
-        W.mat <- W.mat - step.size * (temp.b.vec - y.train) %*% ((dsigmoid(temp.a.mat) %*% v.vec) %*%  X.scaled.train)
+        error <- temp.b.vec - y.train
+        v.vec <- v.vec - step.size * ((t(temp.z.mat) %*% (error)) / n.obeservations)
+        W.mat <- W.mat - step.size * (t(X.scaled.train) %*% ((error) %*% t(v.vec) * dsigmoid(temp.a.mat)) / n.obeservations)
       }
     }
     
