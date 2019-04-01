@@ -143,7 +143,6 @@ NNetEarlyStoppingCV <-
         
       }
     )
-    
     return(result.list)
     
   }
