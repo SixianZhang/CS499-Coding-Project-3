@@ -5,7 +5,7 @@
 #' @param X.mat numeric feature matrix of size [n_observations x n_features].
 #' @param y.vec numeric label vector of length n_observations.
 #' @param max.iterations integer scalar greater than 1.
-#' @param step.size numeric non-negative scalar.
+#' @param step.size numeric positive scalar.
 #' @param n.hidden.units number of hidden units, greater than or equal to 1.
 #' @param is.train logical vector of length n_observations, TRUE if the observation is for training, FALSE for validation
 #'
