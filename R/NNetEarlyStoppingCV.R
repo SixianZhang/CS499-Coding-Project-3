@@ -134,6 +134,7 @@ NNetEarlyStoppingCV <-
       mean.validation.loss.vec = mean.validation.loss.vec,
       mean.train.loss.vec = mean.train.loss.vec,
       selected.steps = selected.steps,
+
       predict = function(testX.mat) {
         prediction.vec <- sigmoid(cbind(1, testX.mat) %*% W.mat) %*% v.vec
         
