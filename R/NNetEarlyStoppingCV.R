@@ -93,30 +93,38 @@ NNetEarlyStoppingCV <-
     for (i.fold in seq(n.fold)) {
       train.index <- which(fold.vec != i.fold)
       validation.index <- which(fold.vec == i.fold)
-
+      train.vec <- (fold.vec != i.fold)
+      
       model.list <-
-        NNetIteration(X.mat[train.index, ],
-                      y.vec[train.index],
+        NNetIteration(X.mat,
+                      y.vec,
                       max.iterations,
                       step.size,
                       n.hidden.units,
-                      TRUE)
+                      train.vec
+                      )
       
       v.vec <- model.list$v.vec
       W.mat <- model.list$W.mat
       
-      train.predict <- cbind(1, sigmoid(cbind(1,X.mat[train.index]) %*% W.mat)) %*% v.vec
+      train.predict <- model$pred.mat[train.index,]
       if(is.binary){
         # Do 0-1 loss
+        train.predict <- ifelse(train.predict > 0.5, 1, 0)
+        train.loss.mat[i.fold,] <- colMeans((ifelse(train.predict == y.vec[train.index], 0, 1)))
       }else{
         # Do square loss
+        train.loss.mat[i.fold,] <- colMeans((train.predict - y.vec[train.index])^2)
       }
-      
-      validation.predict <- cbind(1, sigmoid(cbind(1,X.mat[validation.index]) %*% W.mat)) %*% v.vec
+
+      validation.predict <- model$pred.mat[validation.index,]      
       if(is.binary){
         # Do 0-1 loss
+        validation.predict <- ifelse(validation.predict > 0.5, 1, 0)
+        validation.loss.mat <- colMeans(ifelse(validation.predict == y.vec[validation.index], 0, 1))
       }else{
         # Do square loss
+        validation.loss.mat[i.fold,] <- colMeans((validation.predict - y.vec[validation.index])^2)
       }
     }
     
@@ -125,7 +133,7 @@ NNetEarlyStoppingCV <-
     
     selected.steps <- which.min(mean.train.loss.vec)
     
-    selected.list <- NNetIteration(X.mat, y.vec, selected.steps, step.size, n.hidden.units, TRUE)
+    selected.list <- NNetIteration(X.mat, y.vec, selected.steps, step.size, n.hidden.units, rep(1,n.observation))
     
     result.list <- list(
       pred.mat = selected.list$pred.mat,
