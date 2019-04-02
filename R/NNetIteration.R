@@ -40,13 +40,14 @@ NNetIteration <-
     X.std.mat <- diag(num.feature) * (1 / X.std.vec)
     
     X.scaled.mat <- t((t(X.mat) - X.mean.vec) / X.std.vec)
-    X.scaled.train <- X.scaled.mat[is.train]
+    X.scaled.train <- cbind(1, X.scaled.mat[is.train])
     y.train <- y.vec[is.train]
     pred.mat <- matrix(0, n.obeservations, max.iterations)
-    W.mat <- matrix(runif(n.features * n.hidden.units, 0, 0.2),
-                    n.features, n.hidden.units)
+    W.mat <- matrix(runif((n.features + 1) * n.hidden.units, 0, 0.2),
+                    n.features + 1, n.hidden.units)
     
     v.vec <- runif(n.hidden.units, 0, 0.2)
+    intercept.v <- rep(0, n.obeservations)
 #    w.vec.iter <- runif(0,0.3)  
     
     sigmoid <- function(x){
@@ -60,19 +61,21 @@ NNetIteration <-
     for (iter.index in seq(max.iterations)){
       temp.a.mat <- X.scaled.train %*% W.mat  # n x u
       temp.z.mat <- sigmoid(temp.a.mat)  # n x u
-      temp.b.vec <- temp.z.mat %*% v.vec # n x 1
+      temp.b.vec <- temp.z.mat %*% v.vec + intercept.v # n x 1
       if (is.binary){
         temp.y.vec <- sigmoid(temp.b.vec)
         error <- temp.y.vec - y.train
         v.vec <- v.vec - step.size * ((t(temp.z.mat) %*% error * dsigmoid(temp.b.vec)) / n.obeservations)
         W.mat <- W.mat - step.size * (t(X.scaled.train) %*% ((error * dsigmoid(temp.b.vec)) %*% t(v.vec)
                                                              * dsigmoid(temp.a.mat)) / n.obeservations)
+        intercept.v < - intercept.v - step.size * (error * dsigmoid(temp.b.vec) %*% intercept.v)
         pred.mat[,iter.index] <- temp.y.vec
       }else{
         error <- temp.b.vec - y.train
         v.vec <- v.vec - step.size * ((t(temp.z.mat) %*% (error)) / n.obeservations)
         W.mat <- W.mat - step.size * (t(X.scaled.train) %*% ((error) %*% t(v.vec) *
                                                                dsigmoid(temp.a.mat)) / n.obeservations)
+        intercept.v <- intercept.v - step.size * error
         pred.mat[,iter.index] <- temp.b.vec
       }
     }
