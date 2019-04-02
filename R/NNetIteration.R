@@ -64,29 +64,27 @@ NNetIteration <-
       if (is.binary){
         temp.y.vec <- sigmoid(temp.b.vec)
         error <- temp.y.vec - y.train
-        v.vec <- v.vec - step.size * rowMeans(t(temp.z.mat) %*% (error) %*% t(dsigmoid(temp.b.vec)))
-        W.mat <- W.mat - step.size * (t(X.scaled.train) %*% ((temp.b.vec - y.train) %*% t(v.vec) * dsigmoid(temp.a.mat)) / n.obeservations)
+        v.vec <- v.vec - step.size * ((t(temp.z.mat) %*% error * dsigmoid(temp.b.vec)) / n.obeservations)
+        W.mat <- W.mat - step.size * (t(X.scaled.train) %*% ((error * dsigmoid(temp.b.vec)) %*% t(v.vec)
+                                                             * dsigmoid(temp.a.mat)) / n.obeservations)
+        pred.mat[,iter.index] <- temp.y.vec
       }else{
         error <- temp.b.vec - y.train
         v.vec <- v.vec - step.size * ((t(temp.z.mat) %*% (error)) / n.obeservations)
-        W.mat <- W.mat - step.size * (t(X.scaled.train) %*% ((error) %*% t(v.vec) * dsigmoid(temp.a.mat)) / n.obeservations)
+        W.mat <- W.mat - step.size * (t(X.scaled.train) %*% ((error) %*% t(v.vec) *
+                                                               dsigmoid(temp.a.mat)) / n.obeservations)
+        pred.mat[,iter.index] <- temp.b.vec
       }
     }
     
-    
-    
-    
     result.list <- list(
-      pred.mat = ,
-      W.mat = ,
-      v.vec = ,
+      pred.mat = pred.mat,
+      W.mat = W.mat,
+      v.vec = v.vec,
       predict = function(testX.mat) {
         prediction.vec <- sigmoid(cbind(1, testX.mat) %*% W.mat) %*% v.vec
-        
-        
         return(prediction.vec)
       }
     )
-    
     return(result.list)
   }
