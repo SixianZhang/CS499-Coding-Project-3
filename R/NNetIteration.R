@@ -68,17 +68,19 @@ NNetIteration <-
         v.vec <- v.vec - step.size * ((t(temp.z.mat) %*% error * dsigmoid(temp.b.vec)) / n.obeservations)
         W.mat <- W.mat - step.size * (t(X.scaled.train) %*% ((error * dsigmoid(temp.b.vec)) %*% t(v.vec)
                                                              * dsigmoid(temp.a.mat)) / n.obeservations)
-        intercept.v < - intercept.v - step.size * (error * dsigmoid(temp.b.vec) %*% intercept.v)
+        intercept.v < - intercept.v - step.size * mean(error * dsigmoid(temp.b.vec) %*% intercept.v)
         pred.mat[,iter.index] <- temp.y.vec
       }else{
         error <- temp.b.vec - y.train
         v.vec <- v.vec - step.size * ((t(temp.z.mat) %*% (error)) / n.obeservations)
         W.mat <- W.mat - step.size * (t(X.scaled.train) %*% ((error) %*% t(v.vec) *
                                                                dsigmoid(temp.a.mat)) / n.obeservations)
-        intercept.v <- intercept.v - step.size * error
+        intercept.v <- intercept.v - step.size * mean(error)
         pred.mat[,iter.index] <- temp.b.vec
       }
     }
+    
+    v.vec <- c(intercept.v, v.vec)
     
     result.list <- list(
       pred.mat = pred.mat,
