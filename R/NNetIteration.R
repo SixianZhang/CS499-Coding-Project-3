@@ -26,11 +26,12 @@ NNetIteration <-
            n.hidden.units,
            is.train) {
     
-    if ((y.vec == 0) || (y.vec == 1))
+    if (y.vec %in% c(-1,1))
       is.binary <- 1;
     else
       is.binary <- 0;
-    X.mat <- X.mat[,-1]
+    X.mat <- X.mat[is.train,-1]
+    y.train <- y.vec[is.train]
     n.obeservations <- nrow(X.mat)
     n.features <- ncol(X.mat)
     X.mean.vec <- colMeans(X.mat)
@@ -40,8 +41,7 @@ NNetIteration <-
     X.std.mat <- diag(num.feature) * (1 / X.std.vec)
     
     X.scaled.mat <- t((t(X.mat) - X.mean.vec) / X.std.vec)
-    X.scaled.train <- cbind(1, X.scaled.mat[is.train])
-    y.train <- y.vec[is.train]
+    X.scaled.train <- X.scaled.mat
     pred.mat <- matrix(0, n.obeservations, max.iterations)
     W.mat <- matrix(runif(n.features * n.hidden.units, 0, 0.2),
                     n.features, n.hidden.units)
