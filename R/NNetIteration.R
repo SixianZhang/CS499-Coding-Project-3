@@ -30,7 +30,7 @@ NNetIteration <-
       is.binary <- 1;
     else
       is.binary <- 0;
-    
+    X.mat <- X.mat[,-1]
     n.obeservations <- nrow(X.mat)
     n.features <- ncol(X.mat)
     X.mean.vec <- colMeans(X.mat)
@@ -43,8 +43,8 @@ NNetIteration <-
     X.scaled.train <- cbind(1, X.scaled.mat[is.train])
     y.train <- y.vec[is.train]
     pred.mat <- matrix(0, n.obeservations, max.iterations)
-    W.mat <- matrix(runif((n.features + 1) * n.hidden.units, 0, 0.2),
-                    n.features + 1, n.hidden.units)
+    W.mat <- matrix(runif(n.features * n.hidden.units, 0, 0.2),
+                    n.features, n.hidden.units)
     
     v.vec <- runif(n.hidden.units, 0, 0.2)
     intercept.v <- rep(0, n.obeservations)
@@ -55,7 +55,7 @@ NNetIteration <-
     }
     
     dsigmoid <- function(x){
-      return(exp(x)/(exp(x) + 1) ^ 2)
+      return(sigmoid(x) * (1 - sigmoid(x)))
     }
     
     for (iter.index in seq(max.iterations)){
@@ -63,23 +63,19 @@ NNetIteration <-
       temp.z.mat <- sigmoid(temp.a.mat)  # n x u
       temp.b.vec <- temp.z.mat %*% v.vec + intercept.v # n x 1
       if (is.binary){
-        temp.y.vec <- sigmoid(temp.b.vec)
-        error <- temp.y.vec - y.train
-        v.vec <- v.vec - step.size * ((t(temp.z.mat) %*% error * dsigmoid(temp.b.vec)) / n.obeservations)
-        W.mat <- W.mat - step.size * (t(X.scaled.train) %*% ((error * dsigmoid(temp.b.vec)) %*% t(v.vec)
-                                                             * dsigmoid(temp.a.mat)) / n.obeservations)
-        intercept.v < - intercept.v - step.size * mean(error * dsigmoid(temp.b.vec) %*% intercept.v)
-        pred.mat[,iter.index] <- temp.y.vec
+       ## temp.y.vec <- sigmoid(temp.b.vec)
+        error <- sigmoid(-y.vec * temp.b.vec) * exp(-y.vec * temp.b.vec) * (-y.vec)
+        pred.mat[,iter.index] <- temp.b.vec
       }else{
         error <- temp.b.vec - y.train
+        pred.mat[,iter.index] <-  ifelse(sigmoid(temp.b.vec)>0.5, 1, 0)
+      }
         v.vec <- v.vec - step.size * ((t(temp.z.mat) %*% (error)) / n.obeservations)
         W.mat <- W.mat - step.size * (t(X.scaled.train) %*% ((error) %*% t(v.vec) *
                                                                dsigmoid(temp.a.mat)) / n.obeservations)
         intercept.v <- intercept.v - step.size * mean(error)
-        pred.mat[,iter.index] <- temp.b.vec
-      }
     }
-    
+    W.mat <- rbind(-t(W.mat) %*% X.std.mat %*% X.mean.vec, t(t(W.mat) %*% X.std.mat))
     v.vec <- c(intercept.v, v.vec)
     
     result.list <- list(
