@@ -9,6 +9,7 @@
 #' @param max.iterations integer scalar greater than 1.
 #' @param step.size numeric positive scalar.
 #' @param n.hidden.units number of hidden units, greater than or equal to 1.
+#' @param n.folds positive integer scalar, numbers of folds, default is 4
 #'
 #' @return result.list with named elements:
 #' pred.mat, n_observations x max.iterations matrix of predicted values.
@@ -25,10 +26,11 @@
 NNetEarlyStoppingCV <-
   function(X.mat,
            y.vec,
-           fold.vec,
+           fold.vec = sample(rep(1:n.folds), length(y.vec)),
            max.iterations,
            step.size,
-           n.hidden.units) {
+           n.hidden.units,
+           n.folds = 4) {
     # Check data
     
     if (!all(is.numeric(X.mat), is.matrix(X.mat))) {
@@ -41,21 +43,19 @@ NNetEarlyStoppingCV <-
       stop("y.vec must be a numeric vector of length nrow(X.mat)")
     }
     
-    if (is.null(fold.vec)) {
-      fold.vec <- sample(rep(1:5, l = nrow(X.mat)))
-    } else{
-      if (!all(is.numeric(fold.vec),
-               is.vector(fold.vec),
-               length(fold.vec) == nrow(X.mat))) {
-        stop("fold.vec must be a numeric vector of length nrow(X.mat)")
-      }
+
+    if (!all(is.numeric(fold.vec),
+             is.vector(fold.vec),
+             length(unique(fold.vec)) == n.folds,
+             length(fold.vec) == nrow(X.mat))) {
+      stop("fold.vec must be a numeric vector of length nrow(X.mat) with n.folds unique elements")
     }
-    
+
     if (!all(
       is.numeric(max.iterations),
       is.integer(max.iterations),
-      max.iterations > 1,
-      length(max.iterations) == 1
+      length(max.iterations) == 1,
+      max.iterations > 1
     )) {
       stop("max.iterations must be an integer scalar greater than 1")
     }
@@ -73,24 +73,33 @@ NNetEarlyStoppingCV <-
       stop("n.hidden.units must be an integer scalar greater than or equeal to 1")
     }
     
+    if(!all(
+      is.numeric(n.folds),
+      is.integer(n.folds),
+      n.folds > 0, 
+      length(n.folds) == 1
+    )){
+      stop("n.folds must be a positive integer scalar")
+    }
+    
     # Initialize
     
     is.binary <- ifelse((all(y.vec %in% c(0,1))), TRUE, FALSE)
     
-    n.fold <- length(unique(fold.vec))
+    n.folds <- length(unique(fold.vec))
     n.feature <- ncol(X.mat)
     n.observation <- nrow(X.mat)
     validation.loss.mat <-
-      matrix(0, nrow = n.fold, ncol = max.iterations)
+      matrix(0, nrow = n.folds, ncol = max.iterations)
     train.loss.mat <-
-      matrix(0, nrow = n.fold, ncol = max.iterations)
+      matrix(0, nrow = n.folds, ncol = max.iterations)
     
     sigmoid <- function(x){
       1/(1 + exp(-x))
     }
    
     # iterate through each folds
-    for (i.fold in seq(n.fold)) {
+    for (i.fold in seq(n.folds)) {
       train.index <- which(fold.vec != i.fold)
       validation.index <- which(fold.vec == i.fold)
       train.vec <- (fold.vec != i.fold)
@@ -106,26 +115,46 @@ NNetEarlyStoppingCV <-
       
       v.vec <- model.list$v.vec
       W.mat <- model.list$W.mat
+     
+      set.list <- list(train = fold.vec != i.fold, validation = fold.vec == i.fold)
+      for(set.name in names(set.list)){
+        predict <- model$pred.mat[set.list$set.name,]
+        
+        if(is.binary){
+          # Do 0-1 loss
+          predict <- ifelse(predict > 0.5, 1, 0)
+          loss.mat[i.fold,] <- colMeans((ifelse(predict == y.vec[set.list$set.name], 0, 1)))
+        }else{
+          # Do square loss
+          loss.mat[i.fold,] <- colMeans((predict - y.vec[set.list$set.name])^2)
+        }
+        
+        if(set.name == "train"){
+          train.loss.mat <- loss.mat
+        }else{
+          validation.loss.mat <- loss.mat
+        }
+      }
       
-      train.predict <- model$pred.mat[train.index,]
-      if(is.binary){
-        # Do 0-1 loss
-        train.predict <- ifelse(train.predict > 0.5, 1, 0)
-        train.loss.mat[i.fold,] <- colMeans((ifelse(train.predict == y.vec[train.index], 0, 1)))
-      }else{
-        # Do square loss
-        train.loss.mat[i.fold,] <- colMeans((train.predict - y.vec[train.index])^2)
-      }
-
-      validation.predict <- model$pred.mat[validation.index,]      
-      if(is.binary){
-        # Do 0-1 loss
-        validation.predict <- ifelse(validation.predict > 0.5, 1, 0)
-        validation.loss.mat <- colMeans(ifelse(validation.predict == y.vec[validation.index], 0, 1))
-      }else{
-        # Do square loss
-        validation.loss.mat[i.fold,] <- colMeans((validation.predict - y.vec[validation.index])^2)
-      }
+      # train.predict <- model$pred.mat[train.index,]
+      # if(is.binary){
+      #   # Do 0-1 loss
+      #   train.predict <- ifelse(train.predict > 0.5, 1, 0)
+      #   train.loss.mat[i.fold,] <- colMeans((ifelse(train.predict == y.vec[train.index], 0, 1)))
+      # }else{
+      #   # Do square loss
+      #   train.loss.mat[i.fold,] <- colMeans((train.predict - y.vec[train.index])^2)
+      # }
+      # 
+      # validation.predict <- model$pred.mat[validation.index,]      
+      # if(is.binary){
+      #   # Do 0-1 loss
+      #   validation.predict <- ifelse(validation.predict > 0.5, 1, 0)
+      #   validation.loss.mat <- colMeans(ifelse(validation.predict == y.vec[validation.index], 0, 1))
+      # }else{
+      #   # Do square loss
+      #   validation.loss.mat[i.fold,] <- colMeans((validation.predict - y.vec[validation.index])^2)
+      # }
     }
     
     mean.validation.loss.vec <- colMeans(validation.loss.mat)
@@ -133,24 +162,29 @@ NNetEarlyStoppingCV <-
     
     selected.steps <- which.min(mean.train.loss.vec)
     
-    selected.list <- NNetIteration(X.mat, y.vec, selected.steps, step.size, n.hidden.units, rep(1,n.observation))
+    result.list <- NNetIteration(X.mat, y.vec, selected.steps, step.size, n.hidden.units, rep(1,n.observation))
     
-    result.list <- list(
-      pred.mat = selected.list$pred.mat,
-      W.mat = selected.list$W.mat,
-      v.vec = selected.list$v.vec,
-      mean.validation.loss.vec = mean.validation.loss.vec,
-      mean.train.loss.vec = mean.train.loss.vec,
-      selected.steps = selected.steps,
-
-      predict = function(testX.mat) {
-        prediction.vec <- sigmoid(cbind(1, testX.mat) %*% W.mat) %*% v.vec
-        
-        
-        return(prediction.vec)
-        
-      }
-    )
+    # result.list <- list(
+    #   pred.mat = selected.list$pred.mat,
+    #   W.mat = selected.list$W.mat,
+    #   v.vec = selected.list$v.vec,
+    #   mean.validation.loss.vec = mean.validation.loss.vec,
+    #   mean.train.loss.vec = mean.train.loss.vec,
+    #   selected.steps = selected.steps,
+    # 
+    #   predict = function(testX.mat) {
+    #     prediction.vec <- sigmoid(cbind(1, testX.mat) %*% W.mat) %*% v.vec
+    #     
+    #     
+    #     return(prediction.vec)
+    #     
+    #   }
+    # )
+    
+    result.list$mean.validation.loss.vec = mean.validation.loss.vec
+    result.list$mean.train.loss.vec = mean.train.loss.vec
+    result.list$selected.steps = selected.steps
+    
     return(result.list)
     
   }
