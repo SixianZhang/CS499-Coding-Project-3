@@ -18,7 +18,7 @@
 #' @export
 #'
 #' @examples
-NNetIteration <-
+NNetIterations <-
   function(X.mat,
            y.vec,
            max.iterations,
