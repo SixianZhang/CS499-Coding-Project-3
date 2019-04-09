@@ -18,7 +18,7 @@
 #' @export
 #'
 #' @examples
-NNetIteration <-
+NNetIterations <-
   function(X.mat,
            y.vec,
            max.iterations,
@@ -27,9 +27,10 @@ NNetIteration <-
            is.train) {
     
     if (y.vec %in% c(-1,1))
-      is.binary <- 1;
+      is.binary <- 1
     else
-      is.binary <- 0;
+      is.binary <- 0
+    
     X.mat <- X.mat[is.train,-1]
     y.train <- y.vec[is.train]
     n.obeservations <- nrow(X.mat)
