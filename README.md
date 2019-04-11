@@ -5,4 +5,4 @@ Coding project 3: neural network for regression and binary classification
 * Sixian Zhang
 * Zaoyi Chi
 * Hao Wang
-* Li Huayu
+* Huayu Li
