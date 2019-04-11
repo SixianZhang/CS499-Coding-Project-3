@@ -12,18 +12,21 @@ data.list <- list(
   spam = list(
     features = as.matrix(spam[, 1:57]),
     labels = ifelse(spam$spam == "spam", 1, -1),
+
     is.01 = TRUE
   ),
   
   SAheart = list(
     features = as.matrix(SAheart[, c(1:4, 6:9)]),
     labels = ifelse(SAheart$chd == 1, 1, -1),
+
     is.01 = TRUE
   ),
   
   zip.train = list(
     features = as.matrix(zip.train[,-1]),
     labels = ifelse(zip.train[, 1] == 1, 1, -1),
+
     is.01 = TRUE
   ),
   
