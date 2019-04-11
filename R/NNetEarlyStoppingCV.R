@@ -119,20 +119,15 @@ NNetEarlyStoppingCV <-
      
       set.list <- list(train = fold.vec != i.fold, validation = fold.vec == i.fold)
       for(set.name in names(set.list)){
-        if (set.name == "train")
-          templist <- set.list$train
-        else
-          templist <- set.list$validation
-        
-        predict <- model.list$pred.mat[templist,]
+        predict <- model.list$pred.mat[get(set.name,set.list),]
         
         if(is.binary){
           # Do 0-1 loss
-          predict <- ifelse(predict > 0.5, 1, 0)
-          loss.mat[i.fold,] <- colMeans((ifelse(predict == y.vec[templist], 0, 1)))
+          predict <- ifelse(predict > 0.5, 1, -1)
+          loss.mat[i.fold,] <- colMeans((ifelse(predict == y.vec[get(set.list$set.name)], 0, 1)))
         }else{
           # Do square loss
-          loss.mat[i.fold,] <- colMeans((predict - y.vec[templist])^2)
+          loss.mat[i.fold,] <- colMeans((predict - y.vec[get(set.name,set.list)])^2)
         }
         
         if(set.name == "train"){
