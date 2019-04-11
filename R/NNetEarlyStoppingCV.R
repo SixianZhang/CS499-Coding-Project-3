@@ -13,8 +13,8 @@
 #'
 #' @return result.list with named elements:
 #' pred.mat, n_observations x max.iterations matrix of predicted values.
-#' W.mat final weight matrix (n_features+1 x n.hidden.units).
-#' v.vec final weight vector (n.hidden.units+1).
+#' V.mat final weight matrix (n_features+1 x n.hidden.units).
+#' w.vec final weight vector (n.hidden.units+1).
 #' mean.validation.loss.vec mean loss for all validation sets.
 #' mean.train.loss.vec mean loss for all training sets.
 #' selected steps best step size selected corresponding to the minimum mean validation loss.
@@ -93,6 +93,8 @@ NNetEarlyStoppingCV <-
       matrix(0, nrow = n.folds, ncol = max.iterations)
     train.loss.mat <-
       matrix(0, nrow = n.folds, ncol = max.iterations)
+    loss.mat <-
+      matrix(0, n.folds, max.iterations)
     
     sigmoid <- function(x){
       1/(1 + exp(-x))
@@ -113,12 +115,12 @@ NNetEarlyStoppingCV <-
                       train.vec
                       )
       
-      v.vec <- model.list$v.vec
-      W.mat <- model.list$W.mat
+      w.vec <- model.list$w.vec
+      V.mat <- model.list$V.mat
      
       set.list <- list(train = fold.vec != i.fold, validation = fold.vec == i.fold)
       for(set.name in names(set.list)){
-        predict <- model$pred.mat[set.list$set.name,]
+        predict <- model.list$pred.mat[set.list$set.name,]
         
         if(is.binary){
           # Do 0-1 loss
@@ -166,14 +168,14 @@ NNetEarlyStoppingCV <-
     
     # result.list <- list(
     #   pred.mat = selected.list$pred.mat,
-    #   W.mat = selected.list$W.mat,
-    #   v.vec = selected.list$v.vec,
+    #   V.mat = selected.list$V.mat,
+    #   w.vec = selected.list$w.vec,
     #   mean.validation.loss.vec = mean.validation.loss.vec,
     #   mean.train.loss.vec = mean.train.loss.vec,
     #   selected.steps = selected.steps,
     # 
     #   predict = function(testX.mat) {
-    #     prediction.vec <- sigmoid(cbind(1, testX.mat) %*% W.mat) %*% v.vec
+    #     prediction.vec <- sigmoid(cbind(1, testX.mat) %*% V.mat) %*% w.vec
     #     
     #     
     #     return(prediction.vec)

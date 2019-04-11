@@ -26,7 +26,25 @@ NNetIterations <-
            n.hidden.units,
            is.train) {
     
-    if (y.vec %in% c(-1,1))
+    if (!all(is.matrix(X.mat), is.numeric(X.mat)))
+      stop("The input matrix should be a numeric matrix")
+    
+    if (!all(is.numeric(y.vec), length(y.vec) == nrow(X.mat), is.vector(y.vec)))
+      stop("The input y.vec should be a numeric vector with length nrow(X.mat)")
+    
+    if (!all(is.integer(max.iterations), max.iterations > 0))
+      stop("max.iterations must be a integer, which is greater than 0")
+    
+    if (!all(is.numeric(step.size), step.size > 0))
+      stop("step.size must be numeric, which is greater than 0")
+    
+    if (!all(is.integer(n.hidden.units), n.hidden.units > 0))
+      stop("n.hidden.units must be a integer, which is greater than 0")
+    
+    if (!all(is.vector(is.train), all(is.train %in% c(0,1))))
+      stop("is.train must be a vector with either 0 or 1")
+      
+    if (all(y.vec %in% c(-1,1)))
       is.binary <- 1
     else
       is.binary <- 0
@@ -38,8 +56,8 @@ NNetIterations <-
     X.mean.vec <- colMeans(X.mat)
     
     X.std.vec <-
-      sqrt(rowSums((t(X.mat) - X.mean.vec) ^ 2) / num.train)
-    X.std.mat <- diag(num.feature) * (1 / X.std.vec)
+      sqrt(rowSums((t(X.mat) - X.mean.vec) ^ 2) / n.obeservations)
+    X.std.mat <- diag(n.features) * (1 / X.std.vec)
     
     X.scaled.mat <- t((t(X.mat) - X.mean.vec) / X.std.vec)
     X.scaled.train <- X.scaled.mat
@@ -48,7 +66,7 @@ NNetIterations <-
                     n.features, n.hidden.units)
     
     w.vec <- runif(n.hidden.units, 0, 0.2)
-    intercept.v <- rep(0, n.obeservations)
+    intercept.v <- runif(1,0,0.2)
 #    w.vec.iter <- runif(0,0.3)  
     
     sigmoid <- function(x){
@@ -65,7 +83,7 @@ NNetIterations <-
       temp.b.vec <- temp.z.mat %*% w.vec + intercept.v # n x 1
       if (is.binary){
        ## temp.y.vec <- sigmoid(temp.b.vec)
-        error <- sigmoid(-y.vec * temp.b.vec) * exp(-y.vec * temp.b.vec) * (-y.vec)
+        error <- sigmoid(-y.train * temp.b.vec) * exp(-y.train * temp.b.vec) * (-y.train)
         pred.mat[,iter.index] <- temp.b.vec
       }else{
         error <- temp.b.vec - y.train
@@ -76,7 +94,7 @@ NNetIterations <-
                                                                dsigmoid(temp.a.mat)) / n.obeservations)
         intercept.v <- intercept.v - step.size * mean(error)
     }
-    V.mat <- rbind(-t(V.mat) %*% X.std.mat %*% X.mean.vec, t(t(V.mat) %*% X.std.mat))
+    V.mat <- rbind(t(-t(V.mat) %*% X.std.mat %*% X.mean.vec), t(t(V.mat) %*% X.std.mat))
     w.vec <- c(intercept.v, w.vec)
     
     result.list <- list(
