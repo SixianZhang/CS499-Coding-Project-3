@@ -11,19 +11,22 @@ data(ozone, package = "ElemStatLearn")
 data.list <- list(
   spam = list(
     features = as.matrix(spam[, 1:57]),
-    labels = ifelse(spam$spam == "spam", 1, 0),
+    labels = ifelse(spam$spam == "spam", 1, -1),
+
     is.01 = TRUE
   ),
   
   SAheart = list(
     features = as.matrix(SAheart[, c(1:4, 6:9)]),
-    labels = SAheart$chd,
+    labels = ifelse(SAheart$chd == 1, 1, -1),
+
     is.01 = TRUE
   ),
   
   zip.train = list(
     features = as.matrix(zip.train[,-1]),
-    labels = zip.train[, 1],
+    labels = ifelse(zip.train[, 1] == 1, 1, -1),
+
     is.01 = TRUE
   ),
   
