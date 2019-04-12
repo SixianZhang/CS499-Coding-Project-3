@@ -67,9 +67,9 @@ for (data.name in names(data.list)) {
     
     result.list <- NNetEarlyStoppingCV(X.mat = X.train,
                                        y.vec = y.train,
-                                       max.iterations = 30L,
-                                       step.size = 0.5,
-                                       n.hidden.units = 10L
+                                       max.iterations = 500L,
+                                       step.size = 0.4,
+                                       n.hidden.units = 50L
     )
     
     if (data.set$is.01) {

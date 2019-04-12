@@ -124,7 +124,7 @@ NNetEarlyStoppingCV <-
         if(is.binary){
           # Do 0-1 loss
           predict <- ifelse(predict > 0.5, 1, -1)
-          loss.mat[i.fold,] <- colMeans((ifelse(predict == y.vec[get(set.list$set.name)], 0, 1)))
+          loss.mat[i.fold,] <- colMeans((ifelse(predict == y.vec[get(set.name,set.list)], 0, 1)))
         }else{
           # Do square loss
           loss.mat[i.fold,] <- colMeans((predict - y.vec[get(set.name,set.list)])^2)
