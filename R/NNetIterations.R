@@ -83,7 +83,7 @@ NNetIterations <-
     for (iter.index in seq(max.iterations)){
       temp.a.mat <- X.scaled.train %*% V.mat + rep(1,n.observations) %*% intercept.v  # n x u
       temp.z.mat <- sigmoid(temp.a.mat)  # n x u
-      temp.b.vec <- temp.z.mat %*% w.vec + rep(1,n.observations) * intercept.w# n x 1
+      temp.b.vec <- temp.z.mat %*% w.vec + intercept.w# n x 1
       if (is.binary){
        ## temp.y.vec <- sigmoid(temp.b.vec)
         error <- sigmoid(-y.train * temp.b.vec) * (-y.train)
