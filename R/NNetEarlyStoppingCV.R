@@ -156,7 +156,6 @@ NNetEarlyStoppingCV <-
     
     mean.validation.loss.vec <- colMeans(validation.loss.mat)
     mean.train.loss.vec <- colMeans(train.loss.mat)
-    
     selected.steps <- which.min(mean.validation.loss.vec)
     
     result.list <- NNetIterations(X.mat, y.vec, selected.steps, step.size, n.hidden.units, rep(TRUE,n.observation))
