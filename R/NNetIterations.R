@@ -18,6 +18,15 @@
 #' @export
 #'
 #' @examples
+#' data(spam, package = "ElemStatLearn")
+#' X.mat <- data.matrix(spam[,-ncol(spam)])
+#' y.vec <- as.vector(ifelse(spam$spam == 'spam',1,0))
+#' max.iteration <- 50L
+#' step.size <- 0.02
+#' n.hidden.units = 20L
+#' temp <- sample(rep(1:2,l=length(y.vec)))
+#' is.train <- (temp == 1)
+#' result.list <- NNetIterations(X.mat, y.vec, max.iteration, step.size, n.hidden.units, is.train = is.train)
 NNetIterations <-
   function(X.mat,
            y.vec,
@@ -59,6 +68,8 @@ NNetIterations <-
     
     X.std.vec <-
       sqrt(rowSums((t(X.mat) - X.mean.vec) ^ 2) / n.observations)
+    X.std.vec[X.std.vec == 0] <- 1
+    
     X.std.mat <- diag(n.features) * (1 / X.std.vec)
     
     X.scaled.mat <- t((t(X.mat) - X.mean.vec) / X.std.vec)

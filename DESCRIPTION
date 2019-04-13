@@ -10,3 +10,4 @@ Description: This is a neural network package that learn from a traning data set
 LinkingTo: RcppEigen
 Suggests: ElemStatLearn, rmarkdown, knitr
 VignetteBuilder: knitr, rmarkdown
+RoxygenNote: 6.1.1

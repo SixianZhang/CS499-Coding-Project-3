@@ -23,6 +23,25 @@
 #' @export
 #'
 #' @examples
+#' #Binary Classification:
+#' library(NeuralNetwork)
+#' data(spam, package = "ElemStatLearn")
+#' X.mat = as.matrix(spam[, 1:57])
+#' y.vec  = ifelse(spam$spam == "spam", 1, -1)
+#' result.list <- NNetEarlyStoppingCV(X.mat, y.vec, max.iterations = 30L, step.size = 0.02, 
+#'                                    n.hidden.units = 100L, n.folds = 5L)
+#' y.test <- ifelse(result.list$predict(X.mat[1:3,]) > 0.5, 1, -1)
+#' 
+#' #Linear Regression
+#' 
+#' library(NeuralNetwork)
+#' data(ozone, package = "ElemStatLearn")
+#' X.mat <- as.matrix(ozone[, -1])
+#' y.vec <- as.vector(ozone[, 1])
+#' result.list <- NNetEarlyStoppingCV(X.mat, y.vec, max.iterations = 30L, step.size = 0.02, 
+#'                                    n.hidden.units = 100L, n.folds = 5L)
+#' y.test <- result.list$predict(X.mat[1:3,])
+
 NNetEarlyStoppingCV <-
   function(X.mat,
            y.vec,
