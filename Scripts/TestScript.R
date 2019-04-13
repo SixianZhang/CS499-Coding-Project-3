@@ -12,7 +12,7 @@ data.list <- list(
   spam = list(
     features = as.matrix(spam[, 1:57]),
     labels = ifelse(spam$spam == "spam", 1, -1),
-    step.size = 0.05,
+    step.size = 0.06,
     is.01 = TRUE
   ),
 
