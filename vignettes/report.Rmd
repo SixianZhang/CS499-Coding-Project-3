@@ -187,7 +187,7 @@ colnames(test.loss.mat) <- c("Nerual Network", "Baseline")
 if (!data.set$is.01) {
   barplot(
     test.loss.mat,
-    main = c("Square Regression: ", spam),
+    main = c("Square Regression: ", "spam"),
     xlab = "mean loss value",
     legend = (rownames(test.loss.mat)),
     beside = TRUE
@@ -195,7 +195,7 @@ if (!data.set$is.01) {
 } else{
   barplot(
     test.loss.mat,
-    main = c("Binary Classification: ", spam),
+    main = c("Binary Classification: ", "spam"),
     xlab = "mean loss value",
     legend = (rownames(test.loss.mat)),
     beside = TRUE
@@ -313,7 +313,7 @@ colnames(test.loss.mat) <- c("Nerual Network", "Baseline")
 if (!data.set$is.01) {
   barplot(
     test.loss.mat,
-    main = c("Square Regression: ", SAheart),
+    main = c("Square Regression: ", "SAheart"),
     xlab = "mean loss value",
     legend = (rownames(test.loss.mat)),
     beside = TRUE
@@ -321,7 +321,7 @@ if (!data.set$is.01) {
 } else{
   barplot(
     test.loss.mat,
-    main = c("Binary Classification: ", SAheart),
+    main = c("Binary Classification: ", "SAheart"),
     xlab = "mean loss value",
     legend = (rownames(test.loss.mat)),
     beside = TRUE
@@ -439,7 +439,7 @@ colnames(test.loss.mat) <- c("Nerual Network", "Baseline")
 if (!data.set$is.01) {
   barplot(
     test.loss.mat,
-    main = c("Square Regression: ", zip.train),
+    main = c("Square Regression: ", "zip.train"),
     xlab = "mean loss value",
     legend = (rownames(test.loss.mat)),
     beside = TRUE
@@ -447,7 +447,7 @@ if (!data.set$is.01) {
 } else{
   barplot(
     test.loss.mat,
-    main = c("Binary Classification: ", zip.train),
+    main = c("Binary Classification: ", "zip.train"),
     xlab = "mean loss value",
     legend = (rownames(test.loss.mat)),
     beside = TRUE
@@ -565,7 +565,7 @@ colnames(test.loss.mat) <- c("Nerual Network", "Baseline")
 if (!data.set$is.01) {
   barplot(
     test.loss.mat,
-    main = c("Square Regression: ", prostate),
+    main = c("Square Regression: ", "prostate"),
     xlab = "mean loss value",
     legend = (rownames(test.loss.mat)),
     beside = TRUE
@@ -573,7 +573,7 @@ if (!data.set$is.01) {
 } else{
   barplot(
     test.loss.mat,
-    main = c("Binary Classification: ", prostate),
+    main = c("Binary Classification: ", "prostate"),
     xlab = "mean loss value",
     legend = (rownames(test.loss.mat)),
     beside = TRUE
@@ -691,7 +691,7 @@ colnames(test.loss.mat) <- c("Nerual Network", "Baseline")
 if (!data.set$is.01) {
   barplot(
     test.loss.mat,
-    main = c("Square Regression: ", ozone),
+    main = c("Square Regression: ", "ozone"),
     xlab = "mean loss value",
     legend = (rownames(test.loss.mat)),
     beside = TRUE
@@ -699,7 +699,7 @@ if (!data.set$is.01) {
 } else{
   barplot(
     test.loss.mat,
-    main = c("Binary Classification: ", ozone),
+    main = c("Binary Classification: ", "ozone"),
     xlab = "mean loss value",
     legend = (rownames(test.loss.mat)),
     beside = TRUE
