@@ -17,6 +17,9 @@ if (all(y.vec %in% c(-1,1)))
 result.list <- NNetEarlyStoppingCV(X.mat, y.vec, max.iterations = 500L, step.size = 0.02, 
                                    n.hidden.units = 100L, n.folds = 4L)
 
+matplot(1:500,as.matrix(result.list$mean.validation.loss.vec), type = 'l', lty = 1:2,
+        pch = 15,
+        col = c(17))
 
 
 
