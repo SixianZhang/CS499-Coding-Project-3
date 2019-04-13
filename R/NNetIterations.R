@@ -32,17 +32,17 @@ NNetIterations <-
     if (!all(is.numeric(y.vec), length(y.vec) == nrow(X.mat), is.vector(y.vec)))
       stop("The input y.vec should be a numeric vector with length nrow(X.mat)")
     
-    if (!all(is.integer(max.iterations), max.iterations > 0))
-      stop("max.iterations must be a integer, which is greater than 0")
+    if (!all(is.integer(max.iterations), max.iterations > 0, length(max.iterations) == 1))
+      stop("max.iterations must be a integer scalar, which is greater than 0")
     
-    if (!all(is.numeric(step.size), step.size > 0))
-      stop("step.size must be numeric, which is greater than 0")
+    if (!all(is.numeric(step.size), step.size > 0, length(step.size) == 1))
+      stop("step.size must be numeric scalar, which is greater than 0")
     
-    if (!all(is.integer(n.hidden.units), n.hidden.units > 0))
-      stop("n.hidden.units must be a integer, which is greater than 0")
+    if (!all(is.integer(n.hidden.units), n.hidden.units > 0, length(n.hidden.units) == 1))
+      stop("n.hidden.units must be a integer scalar, which is greater than 0")
     
-    if (!all(is.vector(is.train), all(is.train %in% c(0,1))))
-      stop("is.train must be a vector with either 0 or 1")
+    if (!all(is.vector(is.train), all(is.train %in% c(0,1)), length(is.train) == length(y.vec)))
+      stop("is.train must be a vector with either 0 or 1, with the same size with y.vec")
       
     if (all(y.vec %in% c(-1,1)))
       is.binary <- 1
