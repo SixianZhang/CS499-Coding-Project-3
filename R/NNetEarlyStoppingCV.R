@@ -76,7 +76,7 @@ NNetEarlyStoppingCV <-
     if(!all(
       is.numeric(n.folds),
       is.integer(n.folds),
-      n.folds > 0, 
+      n.folds > 1, 
       length(n.folds) == 1
     )){
       stop("n.folds must be a positive integer scalar")
