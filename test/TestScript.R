@@ -9,27 +9,27 @@ data(prostate, package = "ElemStatLearn")
 data(ozone, package = "ElemStatLearn")
 
 data.list <- list(
-  spam = list(
-    features = as.matrix(spam[, 1:57]),
-    labels = ifelse(spam$spam == "spam", 1, -1),
-
-    is.01 = TRUE
-  ),
-  
-  SAheart = list(
-    features = as.matrix(SAheart[, c(1:4, 6:9)]),
-    labels = ifelse(SAheart$chd == 1, 1, -1),
-
-    is.01 = TRUE
-  ),
-  
-  zip.train = list(
-    features = as.matrix(zip.train[,-1]),
-    labels = ifelse(zip.train[, 1] == 1, 1, -1),
-
-    is.01 = TRUE
-  ),
-  
+  # spam = list(
+  #   features = as.matrix(spam[, 1:57]),
+  #   labels = ifelse(spam$spam == "spam", 1, -1),
+  # 
+  #   is.01 = TRUE
+  # ),
+  # 
+  # SAheart = list(
+  #   features = as.matrix(SAheart[, c(1:4, 6:9)]),
+  #   labels = ifelse(SAheart$chd == 1, 1, -1),
+  # 
+  #   is.01 = TRUE
+  # ),
+  # 
+  # zip.train = list(
+  #   features = as.matrix(zip.train[,-1]),
+  #   labels = ifelse(zip.train[, 1] == 1, 1, -1),
+  # 
+  #   is.01 = TRUE
+  # ),
+  # 
   
   prostate = list(
     features = as.matrix(prostate[, 1:8]),
@@ -44,7 +44,7 @@ data.list <- list(
   )
 )
 
-n.folds <- 4L
+n.folds <- 2L
 
 for (data.name in names(data.list)) {
   data.set <- data.list[[data.name]]
@@ -67,34 +67,30 @@ for (data.name in names(data.list)) {
     
     result.list <- NNetEarlyStoppingCV(X.mat = X.train,
                                        y.vec = y.train,
-                                       max.iterations = 30L,
-                                       step.size = 0.5,
-                                       n.hidden.units = 10L
-    )
+                                       max.iterations = 500L,
+                                       step.size = 0.02,
+                                       n.hidden.units = 100L)
     
     if (data.set$is.01) {
       # binary data
-
-     
-     NNet.predict <- result.list$pred.mat[test.index,]
+     NNet.predict <- result.list$pred.mat
      
      baseline.predict <- mean(y.test)
      
      
     } else{
       # regression data
-      NNet.predict <- result.list$pred.mat[test.index,]
+      NNet.predict <- result.list$pred.mat
       
       baseline.predict <- mean(y.test)
       
     }
     
     
-    # L2 loss
     NNet.loss <- mean((NNet.predict - y.test) ^ 2)
     baseline.loss <- mean((baseline.predict - y.test) ^ 2)
     
-    test.loss.mat[i.fold, ] = c(earlystopping.loss, L2.loss, baseline.loss)
+    test.loss.mat[i.fold, ] = c(NNet.loss, baseline.loss)
   }
 }
 

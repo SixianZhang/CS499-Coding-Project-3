@@ -53,22 +53,23 @@ NNetIterations <-
     n.observations.total <- nrow(X.mat.old)
     X.mat <- X.mat[is.train,]
     y.train <- y.vec[is.train]
-    n.obeservations <- nrow(X.mat)
+    n.observations <- nrow(X.mat)
     n.features <- ncol(X.mat)
     X.mean.vec <- colMeans(X.mat)
     
     X.std.vec <-
-      sqrt(rowSums((t(X.mat) - X.mean.vec) ^ 2) / n.obeservations)
+      sqrt(rowSums((t(X.mat) - X.mean.vec) ^ 2) / n.observations)
     X.std.mat <- diag(n.features) * (1 / X.std.vec)
     
     X.scaled.mat <- t((t(X.mat) - X.mean.vec) / X.std.vec)
     X.scaled.train <- X.scaled.mat
-    pred.mat <- matrix(0, n.obeservations.total, max.iterations)
-    V.mat <- matrix(runif(n.features * n.hidden.units, 0, 0.2),
+    pred.mat <- matrix(0, n.observations.total, max.iterations)
+    V.mat <- matrix(rnorm(n.features * n.hidden.units),
                     n.features, n.hidden.units)
     
-    w.vec <- runif(n.hidden.units, 0, 0.2)
-    intercept.v <- runif(1,0,0.2)
+    w.vec <- rnorm(n.hidden.units)
+    intercept.v <- matrix(rnorm(n.hidden.units),1,n.hidden.units)
+    intercept.w <- rnorm(1)
 #    w.vec.iter <- runif(0,0.3)  
     
     sigmoid <- function(x){
@@ -80,34 +81,39 @@ NNetIterations <-
     }
     
     for (iter.index in seq(max.iterations)){
-      temp.a.mat <- X.scaled.train %*% V.mat  # n x u
+      temp.a.mat <- X.scaled.train %*% V.mat + rep(1,n.observations) %*% intercept.v  # n x u
       temp.z.mat <- sigmoid(temp.a.mat)  # n x u
-      temp.b.vec <- temp.z.mat %*% w.vec + intercept.v # n x 1
+      temp.b.vec <- temp.z.mat %*% w.vec + intercept.w# n x 1
       if (is.binary){
        ## temp.y.vec <- sigmoid(temp.b.vec)
-        error <- sigmoid(-y.train * temp.b.vec) * exp(-y.train * temp.b.vec) * (-y.train)
+        error <- sigmoid(-y.train * temp.b.vec) * (-y.train)
       }else{
         error <- temp.b.vec - y.train
       }
-        w.vec <- w.vec - step.size * ((t(temp.z.mat) %*% (error)) / n.obeservations)
-        V.mat <- V.mat - step.size * (t(X.scaled.train) %*% ((error) %*% t(w.vec) *
-                                                               dsigmoid(temp.a.mat)) / n.obeservations)
-        intercept.v <- intercept.v - step.size * mean(error)
+      w.vec <- w.vec - step.size * ((t(temp.z.mat) %*% (error)) / n.observations)
+      V.mat <- V.mat - step.size * (t(X.scaled.train) %*% ((error) %*% t(w.vec) *
+                                                               dsigmoid(temp.a.mat)) / n.observations)
+      intercept.v <- intercept.v - step.size * (t(rep(1,n.observations)) %*% (error %*% t(w.vec)
+                                                                              * dsigmoid(temp.a.mat))) / n.observations
+      intercept.w <- intercept.w - step.size * (t(rep(1,n.observations)) %*% error) / n.observations
+        
+      V.mat.temp <- rbind(t((-t(V.mat) %*% X.std.mat %*% X.mean.vec)) + intercept.v, t(t(V.mat) %*% X.std.mat))
+      w.vec.temp <- c(intercept.w, w.vec)
+      
+      if (is.binary){
+        pred.mat[,iter.index] <- sigmoid(cbind(1, sigmoid(cbind(1, X.mat.old)) %*% V.mat.temp) %*% w.vec.temp)
+      }else
+        pred.mat[,iter.index] <- cbind(1, sigmoid(cbind(1, X.mat.old) %*% V.mat.temp)) %*% w.vec.temp
     }
-    V.mat <- rbind(t(-t(V.mat) %*% X.std.mat %*% X.mean.vec), t(t(V.mat) %*% X.std.mat))
-    w.vec <- c(intercept.v, w.vec)
-    
-    if (is.binary){
-      pred.mat <- ifelse(sigmoid(sigmoid(cbind(1, X.mat.old) %*% V.mat) %*% w.vec) > 0.5, 1, -1)
-    }else
-      pred.mat <- sigmoid(cbind(1, X.mat.old) %*% V.mat) %*% w.vec
+    V.mat <- V.mat.temp
+    w.vec <- w.vec.temp
     
     result.list <- list(
       pred.mat = pred.mat,
-      V.mat = V.mat,
-      w.vec = w.vec,
+      V.mat = V.mat.temp,
+      w.vec = w.vec.temp,
       predict = function(testX.mat) {
-        prediction.vec <- sigmoid(cbind(1, testX.mat) %*% V.mat) %*% w.vec
+        prediction.vec <- cbind(1, sigmoid(cbind(1, testX.mat) %*% V.mat)) %*% w.vec
         return(prediction.vec)
       }
     )
