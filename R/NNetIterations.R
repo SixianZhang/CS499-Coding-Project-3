@@ -105,6 +105,8 @@ NNetIterations <-
       }else
         pred.mat[,iter.index] <- cbind(1, sigmoid(cbind(1, X.mat.old) %*% V.mat.temp)) %*% w.vec.temp
     }
+    V.mat <- V.mat.temp
+    w.vec <- w.vec.temp
     
     result.list <- list(
       pred.mat = pred.mat,
