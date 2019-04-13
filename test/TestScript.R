@@ -44,7 +44,7 @@ data.list <- list(
   )
 )
 
-n.folds <- 4L
+n.folds <- 1L
 
 for (data.name in names(data.list)) {
   data.set <- data.list[[data.name]]
@@ -69,13 +69,10 @@ for (data.name in names(data.list)) {
                                        y.vec = y.train,
                                        max.iterations = 500L,
                                        step.size = 0.02,
-                                       n.hidden.units = 100L
-    )
+                                       n.hidden.units = 100L)
     
     if (data.set$is.01) {
       # binary data
-
-     
      NNet.predict <- result.list$pred.mat[test.index,]
      
      baseline.predict <- mean(y.test)

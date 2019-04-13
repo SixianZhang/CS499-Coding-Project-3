@@ -186,6 +186,7 @@ NNetEarlyStoppingCV <-
     result.list$mean.train.loss.vec = mean.train.loss.vec
     result.list$selected.steps = selected.steps
     
+    
     return(result.list)
     
   }
