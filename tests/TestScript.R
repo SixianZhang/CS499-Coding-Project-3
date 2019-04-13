@@ -12,31 +12,31 @@ data.list <- list(
   spam = list(
     features = as.matrix(spam[, 1:57]),
     labels = ifelse(spam$spam == "spam", 1, -1),
-    
+
     is.01 = TRUE
   ),
-  
+
   SAheart = list(
     features = as.matrix(SAheart[, c(1:4, 6:9)]),
     labels = ifelse(SAheart$chd == 1, 1, -1),
-    
+
     is.01 = TRUE
   ),
-  
+
   zip.train = list(
     features = as.matrix(zip.train[,-1]),
     labels = ifelse(zip.train[, 1] == 1, 1, -1),
-    
+
     is.01 = TRUE
   ),
-  
-  
+
+
   prostate = list(
     features = as.matrix(prostate[, 1:8]),
     labels = prostate$lpsa,
     is.01 = FALSE
   ),
-  
+
   ozone = list(
     features = as.matrix(ozone[, -1]),
     labels = ozone[, 1],
@@ -44,11 +44,11 @@ data.list <- list(
   )
 )
 
-n.folds <- 4L
+n.folds <- 2L
 
 for (data.name in names(data.list)) {
   data.set <- data.list[[data.name]]
-  test.loss.mat <- matrix(0, nrow = 4, ncol = 3)
+  test.loss.mat <- matrix(0, nrow = n.folds, ncol = 2)
   
   #Check data type here:
   
@@ -67,34 +67,41 @@ for (data.name in names(data.list)) {
     
     result.list <- NNetEarlyStoppingCV(X.mat = X.train,
                                        y.vec = y.train,
-                                       max.iterations = 30L,
-                                       step.size = 0.5,
-                                       n.hidden.units = 10L
-    )
+                                       max.iterations = 500L,
+                                       step.size = 0.02,
+                                       n.hidden.units = 100L)
     
     if (data.set$is.01) {
       # binary data
-      
-      
-      NNet.predict <- result.list$pred.mat[test.index,]
+      NNet.predict <- ifelse(result.list$predict(X.test) > 0.5, 1, -1)
+      NNet.loss <- ifelse(NNet.predict == y.test, 0, 1)
       
       baseline.predict <- mean(y.test)
       
       
     } else{
       # regression data
-      NNet.predict <- result.list$pred.mat[test.index,]
+      NNet.predict <- result.list$predict(X.test)
+      NNet.loss <- mean((NNet.predict - y.test) ^ 2)
       
       baseline.predict <- mean(y.test)
       
     }
     
     
-    # L2 loss
-    NNet.loss <- mean((NNet.predict - y.test) ^ 2)
     baseline.loss <- mean((baseline.predict - y.test) ^ 2)
     
-    test.loss.mat[i.fold, ] = c(earlystopping.loss, L2.loss, baseline.loss)
+    test.loss.mat[i.fold, ] = c(NNet.loss, baseline.loss)
+    
+    matplot(x = seq(1,500),
+            y = result.list$mean.validation.loss.vec,
+            xlab = "penalty",
+            ylab = "mean loss value",
+            type = "l",
+            lty = 1:2,
+            pch = 15,
+            col = c(17)
+    )
   }
 }
 
@@ -104,10 +111,7 @@ for (data.name in names(data.list)) {
 # X.mat <- data.set$features
 # y.vec <- data.set$labels
 # 
-# matpoints(x = dot.x,
-#           y = dot.y,
-#           col = 2,
-#           pch = 19)
+
 # legend(
 #   x = 0,
 #   y = max(
