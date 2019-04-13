@@ -87,7 +87,6 @@ for (data.name in names(data.list)) {
     }
     
     
-    # L2 loss
     NNet.loss <- mean((NNet.predict - y.test) ^ 2)
     baseline.loss <- mean((baseline.predict - y.test) ^ 2)
     
