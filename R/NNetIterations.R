@@ -59,6 +59,8 @@ NNetIterations <-
     
     X.std.vec <-
       sqrt(rowSums((t(X.mat) - X.mean.vec) ^ 2) / n.observations)
+    X.std.vec[X.std.vec == 0] <- 1
+    
     X.std.mat <- diag(n.features) * (1 / X.std.vec)
     
     X.scaled.mat <- t((t(X.mat) - X.mean.vec) / X.std.vec)
