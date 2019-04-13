@@ -108,8 +108,8 @@ NNetIterations <-
     
     result.list <- list(
       pred.mat = pred.mat,
-      V.mat = V.mat,
-      w.vec = w.vec,
+      V.mat = V.mat.temp,
+      w.vec = w.vec.temp,
       predict = function(testX.mat) {
         prediction.vec <- cbind(1, sigmoid(cbind(1, testX.mat) %*% V.mat)) %*% w.vec
         return(prediction.vec)
