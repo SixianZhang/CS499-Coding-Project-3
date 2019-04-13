@@ -93,8 +93,6 @@ NNetEarlyStoppingCV <-
       matrix(0, nrow = n.folds, ncol = max.iterations)
     train.loss.mat <-
       matrix(0, nrow = n.folds, ncol = max.iterations)
-    loss.mat <-
-      matrix(0, n.folds, max.iterations)
     
     sigmoid <- function(x){
       1/(1 + exp(-x))
@@ -102,8 +100,6 @@ NNetEarlyStoppingCV <-
    
     # iterate through each folds
     for (i.fold in seq(n.folds)) {
-      train.index <- which(fold.vec != i.fold)
-      validation.index <- which(fold.vec == i.fold)
       train.vec <- (fold.vec != i.fold)
       
       model.list <-
@@ -117,23 +113,23 @@ NNetEarlyStoppingCV <-
       w.vec <- model.list$w.vec
       V.mat <- model.list$V.mat
      
-      set.list <- list(train = fold.vec != i.fold, validation = fold.vec == i.fold)
+      set.list <- list(train = train.vec, validation = (!train.vec))
       for(set.name in names(set.list)){
         predict <- model.list$pred.mat[get(set.name,set.list),]
         
         if(is.binary){
           # Do 0-1 loss
           predict <- ifelse(predict > 0.5, 1, -1)
-          loss.mat[i.fold,] <- colMeans((ifelse(predict == y.vec[get(set.name,set.list)], 0, 1)))
+          loss.vec <- colMeans((ifelse(predict == y.vec[get(set.name,set.list)], 0, 1)))
         }else{
           # Do square loss
-          loss.mat[i.fold,] <- colMeans((predict - y.vec[get(set.name,set.list)])^2)
+          loss.vec <- colMeans((predict - y.vec[get(set.name,set.list)])^2)
         }
         
         if(set.name == "train"){
-          train.loss.mat <- loss.mat
+          train.loss.mat[i.fold,] <- loss.vec
         }else{
-          validation.loss.mat <- loss.mat
+          validation.loss.mat[i.fold,] <- loss.vec
         }
       }
       
@@ -161,7 +157,7 @@ NNetEarlyStoppingCV <-
     mean.validation.loss.vec <- colMeans(validation.loss.mat)
     mean.train.loss.vec <- colMeans(train.loss.mat)
     
-    selected.steps <- which.min(mean.train.loss.vec)
+    selected.steps <- which.min(mean.validation.loss.vec)
     
     result.list <- NNetIterations(X.mat, y.vec, selected.steps, step.size, n.hidden.units, rep(1,n.observation))
     
