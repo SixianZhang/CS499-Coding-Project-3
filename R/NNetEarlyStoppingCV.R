@@ -159,7 +159,7 @@ NNetEarlyStoppingCV <-
     
     selected.steps <- which.min(mean.validation.loss.vec)
     
-    result.list <- NNetIterations(X.mat, y.vec, selected.steps, step.size, n.hidden.units, rep(1,n.observation))
+    result.list <- NNetIterations(X.mat, y.vec, selected.steps, step.size, n.hidden.units, rep(TRUE,n.observation))
     
     # result.list <- list(
     #   pred.mat = selected.list$pred.mat,
