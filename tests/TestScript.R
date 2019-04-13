@@ -27,7 +27,7 @@ data.list <- list(
     zip.train = list(
       features = as.matrix(zip.train[,-1]),
       labels = ifelse(zip.train[, 1] == 1, 1, -1),
-      step.size = 0.01,
+      step.size = 0.05,
 
       is.01 = TRUE
   #   ),
@@ -51,7 +51,7 @@ data.list <- list(
 
 n.folds <- 5L
 n.hidden.units <- 10L
-max.iterations <- 30L
+max.iterations <- 500L
 
 for (data.name in names(data.list)) {
   data.set <- data.list[[data.name]]
@@ -139,7 +139,7 @@ for (data.name in names(data.list)) {
   
   
   matplot(
-    x = seq(1, 500),
+    x = seq(1, max.iterations),
     y = cbind(model.list$mean.validation.loss.vec, model.list$mean.train.loss.vec),
     xlab = "Iteration",
     ylab = "mean loss value",
