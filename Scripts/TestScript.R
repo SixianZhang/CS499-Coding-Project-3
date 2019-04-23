@@ -11,42 +11,9 @@ data(ozone, package = "ElemStatLearn")
 data.list <- list(
   spam = list(
     features = as.matrix(spam[, 1:57]),
-    labels = ifelse(spam$spam == "spam", 1, -1),
+    labels = ifelse(spam$spam == "spam", 1, 0),
     step.size = 0.06,
     is.01 = TRUE
-  ),
-
-  SAheart = list(
-    features = as.matrix(SAheart[, c(1:4, 6:9)]),
-    labels = ifelse(SAheart$chd == 1, 1, -1),
-    step.size = 0.02,
-
-    is.01 = TRUE
-  ),
-
-    zip.train = list(
-      features = as.matrix(zip.train[,-1]),
-      labels = ifelse(zip.train[, 1] == 1, 1, -1),
-      step.size = 0.05,
-
-      is.01 = TRUE
-    ),
-
-
-    prostate = list(
-      features = as.matrix(prostate[, 1:8]),
-      labels = prostate$lpsa,
-      step.size = 0.02,
-
-      is.01 = FALSE
-    ),
-
-  ozone = list(
-    features = as.matrix(ozone[,-1]),
-    labels = ozone[, 1],
-    step.size = 0.02,
-
-    is.01 = FALSE
   ))
 
 n.folds <- 5L
@@ -85,7 +52,7 @@ for (data.name in names(data.list)) {
     if (data.set$is.01) {
       # binary data
       NNet.predict <-
-        ifelse(result.list$predict(X.test) > 0.5, 1,-1)
+        ifelse(result.list$predict(X.test) > 0.5, 1,0)
       NNet.loss <- mean(ifelse(NNet.predict == y.test, 0, 1))
       
       baseline.predict <- mean(y.test)

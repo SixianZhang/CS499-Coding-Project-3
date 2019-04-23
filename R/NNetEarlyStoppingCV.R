@@ -103,7 +103,7 @@ NNetEarlyStoppingCV <-
     
     # Initialize
     
-    is.binary <- ifelse((all(y.vec %in% c(-1,1))), TRUE, FALSE)
+    is.binary <- ifelse((all(y.vec %in% c(0,1))), TRUE, FALSE)
     
     n.folds <- length(unique(fold.vec))
     n.feature <- ncol(X.mat)
@@ -138,7 +138,7 @@ NNetEarlyStoppingCV <-
         
         if(is.binary){
           # Do 0-1 loss
-          predict <- ifelse(predict > 0.5, 1, -1)
+          predict <- ifelse(predict > 0.5, 1, 0)
           loss.vec <- colMeans((ifelse(predict == y.vec[get(set.name,set.list)], 0, 1)))
         }else{
           # Do square loss
