@@ -144,8 +144,13 @@ NNetIterations <-
       V.mat = V.mat.temp,
       w.vec = w.vec.temp,
       predict = function(testX.mat) {
-        prediction.vec <-
-          cbind(1, sigmoid(cbind(1, testX.mat) %*% V.mat)) %*% w.vec
+        if(is.binary){
+          prediction.vec <-
+            sigmoid(cbind(1, sigmoid(cbind(1, testX.mat) %*% V.mat)) %*% w.vec)
+        }else{
+          prediction.vec <-
+            cbind(1, sigmoid(cbind(1, testX.mat) %*% V.mat)) %*% w.vec
+        }
         return(prediction.vec)
       }
     )
